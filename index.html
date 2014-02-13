@@ -195,6 +195,11 @@ class: center, middle, inverse
 # How?
 
 ---
+class: center, middle, inverse
+# Test::More
+## The Standard
+
+---
 class: middle
 .center[
 # Some code to test
@@ -215,11 +220,6 @@ sub mult {
 
 1;
 ```
----
-class: center, middle, inverse
-# Test::More
-## The Standard
-
 ---
 class: middle
 .center[
@@ -287,24 +287,318 @@ not ok 3
 # Looks like you failed 1 test of 3.
 ```
 ---
-class: center, middle
-# Test::Deep
-
----
-class: center, middle
+class: inverse, center, middle
 # Test::Differences
 
 ---
-class: center, middle
+class: middle
+.center[
+# Some code to test
+]
+```perl
+package Lorem;
+
+sub ipsum() {
+    return &lt;&lt;LOREM;
+Lorem ipsum dolor sit amet, consectetur
+adipiscing elit. Nullam porta augue et
+mattis egestas. Praesent mollis ultricies
+felis. Nullam convallis ligula non
+dui elementum porttitor. Duis ultricies
+placerat tortor, vel lacinia sem
+condimentum ut.
+LOREM
+}
+
+sub array() {
+    return split "\n", ipsum();
+}
+
+1;
+```
+---
+class: middle
+.center[
+# Test a block of text
+]
+
+```perl
+use Lorem;
+use Test::More;
+use Test::Differences;
+
+eq_or_diff( Lorem::ipsum, &lt;&lt;LOREM );
+Gollum ipsum dolor sit amet, consectetur
+adipiscing elit. Nullam porta augue et
+mattis egestas. Praesent mollis ultricies
+felis. Nullam convallis ligula non
+dui elementum porttitor. Duis ultricies
+placerat tortor, vel lacinia sem
+condimentum ut.
+LOREM
+```
+---
+class: middle
+.center[
+# Run the Test
+]
+```
+$ perl t/lorem.t
+not ok 1
+#   Failed test at lorem.t line 6.
+# +---+-------------------------------------------+-------------------------------------------+
+# | Ln|Got                                        |Expected                                   |
+# +---+-------------------------------------------+-------------------------------------------+
+# *  1|'Lorem ipsum dolor sit amet, consectetur   |'Gollum ipsum dolor sit amet, consectetur  *
+# |  2|adipiscing elit. Nullam porta augue et     |adipiscing elit. Nullam porta augue et     |
+# |  3|mattis egestas. Praesent mollis ultricies  |mattis egestas. Praesent mollis ultricies  |
+# |  4|felis. Nullam convallis ligula non         |felis. Nullam convallis ligula non         |
+# |  5|dui elementum porttitor. Duis ultricies    |dui elementum porttitor. Duis ultricies    |
+# |  6|placerat tortor, vel lacinia sem           |placerat tortor, vel lacinia sem           |
+# |  7|condimentum ut.                            |condimentum ut.                            |
+# |  8|'                                          |'                                          |
+# +---+-------------------------------------------+-------------------------------------------+
+1..1
+# Looks like you failed 1 test of 1.
+```
+---
+class: middle
+.center[
+# Test arrays of items
+]
+
+```perl
+use Lorem;
+use Test::More;
+use Test::Differences;
+
+eq_or_diff(
+    [ Lorem::array ],
+    [
+        'Lorem ipsum dolor sit amet, consectetur',
+        'adipiscing elit. Nullam porta augue et',
+        'mattis egestas. Praesent mollis ultricies',
+        'felis. Nullam convallis ligula non',
+        'dui elementum porttitor. Duis ultricies',
+        'placerat tortor, vel lacinia sem',
+        'condimentum ut.',
+    ],
+);
+
+```
+---
+class: middle
+.center[
+# Run the test
+]
+```
+not ok 1
+#   Failed test at lorem.t line 6.
+# +----+---------------------------------------------+---------------------------------------------+
+# | Elt|Got                                          |Expected                                     |
+# +----+---------------------------------------------+---------------------------------------------+
+# *   0|'Lorem ipsum dolor sit amet, consectetur'    |'Gollum ipsum dolor sit amet, consectetur'   *
+# |   1|'adipiscing elit. Nullam porta augue et'     |'adipiscing elit. Nullam porta augue et'     |
+# |   2|'mattis egestas. Praesent mollis ultricies'  |'mattis egestas. Praesent mollis ultricies'  |
+# |   3|'felis. Nullam convallis ligula non'         |'felis. Nullam convallis ligula non'         |
+# |   4|'dui elementum porttitor. Duis ultricies'    |'dui elementum porttitor. Duis ultricies'    |
+# |   5|'placerat tortor, vel lacinia sem'           |'placerat tortor, vel lacinia sem'           |
+# |   6|'condimentum ut.'                            |'condimentum ut.'                            |
+# +----+---------------------------------------------+---------------------------------------------+
+1..1
+# Looks like you failed 1 tests of 1.
+```
+---
+class: inverse, center, middle
 # Test::Exception
 
+Test life and death
 ---
-class: center, middle
-# Test::NoWarnings
+class: middle
+.center[
+# Code to test
+]
+```perl
+package Dies;
 
+sub dies {
+    die "To be or not to be!";
+}
+
+sub lives {
+    "To be!";
+}
+
+sub throws {
+    die bless {}, 'Shake::Spear';
+}
+
+1;
+```
+---
+class: middle
+.center[
+# Tests
+]
+```perl
+use Dies;
+use Test::More;
+use Test::Exception;
+
+dies_ok { Dies::dies };
+lives_ok { Dies::lives };
+throws_ok { Dies::dies } qr{^To be};
+throws_ok { Dies::throws } 'Shake::Spear';
+
+done_testing;
+```
+---
+class: middle
+.center[
+# Run the Tests
+]
+```perl
+$ perl t/dies.t
+ok 1
+ok 2
+ok 3 - threw Regexp ((?^:^To be))
+ok 4 - threw Shake::Spear
+1..4
+```
+---
+class: inverse, center, middle
+# Test::Deep
+The Data Structure Test Module
+---
+class: middle
+.center[
+# Code To Test
+]
+```perl
+package Simpsons;
+
+sub names {
+    return [ qw( Homer Marge ) ];
+}
+
+sub homer {
+    return {
+        age =&gt; 40,
+        aliases =&gt; [ 'Mr. Plow', 'Max Power' ],
+    }
+}
+
+sub marge {
+    return {
+        age =&gt; 34,
+        aliases =&gt; [ ],
+    }
+}
+
+sub all {
+    return [ homer(), marge() ];
+}
+
+1;
+```
+---
+class: middle
+.center[
+# Test Arrays
+]
+```perl
+use Test::More;
+use Test::Deep;
+
+use Simpsons;
+
+cmp_deeply Simpsons::names, [ 'Homer', 'Marge' ];
+cmp_deeply Simpsons::names, bag( 'Marge', 'Homer' );
+cmp_deeply Simpsons::names, superbagof( 'Homer' );
+cmp_deeply Simpsons::names, subbagof( 'Homer', 'Marge', 'Bart' );
+
+cmp_deeply Simpsons::names, [ 'Homer', 'Marge', 'Bart' ];
+cmp_deeply Simpsons::names, [ 'Marge', 'Homer' ];
+
+done_testing;
+```
+---
+class: middle
+.center[
+# Run the Tests
+]
+```
+$ perl simpsons.t
+ok 1
+ok 2
+ok 3
+ok 4
+not ok 5
+#   Failed test at simpsons.t line 12.
+# Compared array length of $data
+#    got : array with 2 element(s)
+# expect : array with 3 element(s)
+not ok 6
+#   Failed test at simpsons.t line 13.
+# Compared $data->[0]
+#    got : 'Homer'
+# expect : 'Marge'
+1..6
+# Looks like you failed 2 tests of 6.
+```
+---
+class: middle
+.center[
+# Test Hashes
+]
+```perl
+cmp_deeply Simpsons::homer,
+    { age =&gt; 40, aliases =&gt; [ 'Mr. Plow', 'Max Power' ] };
+cmp_deeply Simpsons::marge, { age =&gt; 34, aliases =&gt; [ ] };
+
+cmp_deeply Simpsons::homer, 
+    { age =&gt; 40, aliases =&gt; bag( 'Max Power', 'Mr. Plow' ) };
+cmp_deeply Simpsons::marge, { age =&gt; 34, aliases =&gt; ignore() };
+
+cmp_deeply
+    Simpsons::all,
+    bag(
+        { age =&gt; 34, aliases =&gt; [] },
+        { age =&gt; 40, aliases =&gt; [ 'Max Power' ] },
+    );
+
+# All ages must be integers
+cmp_deeply
+    Simpsons::all,
+    array_each( superhashof( { age =&gt; re( qr(^\d+$) ) } ) );
+```
+---
+class: middle
+.center[
+# Run the Tests
+]
+```
+$ perl simpsons_hash.t
+ok 1
+ok 2
+ok 3
+ok 4
+not ok 5
+#   Failed test at simpsons_hash.t line 13.
+# Comparing $data as a Bag
+# Missing: 1 reference
+# Extra: 1 reference
+ok 6
+1..6
+# Looks like you failed 1 test of 6.
+```
+---
+class: center, middle, inverse
+# Use ALL THE MODULES
 ---
 class: center, middle
 # Test::Most
+
 Test::More
 
 Test::Deep
@@ -313,6 +607,54 @@ Test::Differences
 
 Test::Exception
 ---
+class: middle
+.center[
+# Remove The Boilerplate
+]
+```perl
+use strict;
+use warnings;
+use Test::More;
+use Test::Exception;
+use Test::Deep;
+use Test::Differences;
+use Test::Warn;
+```
+```perl
+use Test::Most;
+```
+---
+class: middle
+.center[
+# Die on Failure
+]
+```perl
+use Test::More 'die';
+```
+---
+class: middle
+.center[
+# Test::Kit
+Build your own Test::Most
+]
+```perl
+package My::Test::Kit;
+
+use Test::Kit qw(
+    strict
+    warnings
+    Test::More
+    Test::Deep
+    Test::Exception
+    Test::NoWarnings
+);
+
+1;
+```
+```perl
+use My::Test::Kit;
+```
+---
 class: center, middle, inverse
 # Organize Your Tests
 ---
@@ -320,9 +662,109 @@ class: center, middle
 # subtest
 ### Part of Test::More
 ---
+class: middle
+.center[
+# Group tests together
+]
+```perl
+use Test::More;
+use MyCalc;
+
+subtest 'add tests' =&gt; sub {
+    is MyCalc::add( 2, 3 ), 5;
+    is MyCalc::add( 2, 2 ), 5;
+};
+subtest 'mult tests' =&gt; sub {
+    is MyCalc::mult( 2, 3 ), 6;
+    is MyCalc::mult( 0, 4 ), 0;
+};
+
+done_testing;
+```
+---
+class: middle
+.center[
+# Run the Tests
+]
+```
+$ perl subtest.t
+    ok 1
+    not ok 2
+    #   Failed test at subtest.t line 7.
+    #          got: '4'
+    #     expected: '5'
+    1..2
+    # Looks like you failed 1 test of 2.
+not ok 1 - add tests
+#   Failed test 'add tests'
+#   at subtest.t line 8.
+    ok 1
+    ok 2
+    1..2
+ok 2 - mult tests
+1..2
+# Looks like you failed 1 test of 2.
+```
+---
 class: center, middle
 # Test::Class::Moose
 ### Class-based tests
+---
+class: center, middle
+# Why Test Classes?
+Tests with OO
+
+Inherit Tests
+
+Compose with Roles
+
+Test Plugin Points
+---
+class: middle
+.center[
+# A Test Class
+]
+```perl
+package TestsFor::MyCalc;
+
+use Test::Class::Moose;
+use MyCalc;
+
+sub test_add {
+    is MyCalc::add( 2, 3 ), 5;
+    is MyCalc::add( 2, 2 ), 5;
+}
+sub test_mult {
+    is MyCalc::mult( 2, 3 ), 6;
+    is MyCalc::mult( 0, 4 ), 0;
+}
+
+1;
+```
+---
+class: middle
+.center[
+# Run the Tests
+]
+```
+$ perl testlib.t
+1..1
+#
+# Running tests for TestsFor::MyCalc
+#
+    1..2
+    # TestsFor::MyCalc-&gt;test_add()
+        ok 1
+        ok 2
+        1..2
+    ok 1 - test_add
+    # TestsFor::MyCalc-&gt;test_mult()
+        ok 1
+        ok 2
+        1..2
+    ok 2 - test_mult
+ok 1 - TestsFor::MyCalc
+```
 ---
 class: center, middle, inverse
 
